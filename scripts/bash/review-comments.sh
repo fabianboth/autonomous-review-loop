@@ -81,7 +81,7 @@ main() {
         [.reviews.nodes[]
             | select(.body != null and .body != "")
             | select(([.reactions.nodes[] | select(.user.login == $user and .content == "THUMBS_UP")] | length) == 0)
-            | {id: .id, author: .author.login, body: (.body | gsub("<!--[^>]*-->"; "") | gsub("^\\s+|\\s+$"; ""))}
+            | {id: .id, author: .author.login, body: (.body | gsub("<!--.*?-->"; "") | gsub("^\\s+|\\s+$"; ""))}
             | select(.body != "")
         ]')
 
