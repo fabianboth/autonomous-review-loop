@@ -34,8 +34,6 @@ Copy the skill directory to your project:
 cp -r .claude/skills/reviewloop /path/to/your/project/.claude/skills/
 ```
 
-Or if you want the skill available in your project, copy the entire `.claude/skills/reviewloop/` directory to your project's `.claude/skills/` folder.
-
 ### Option 2: Standalone Scripts
 
 If you're not using Claude Code, you can use the scripts directly:
@@ -51,7 +49,7 @@ cd autonomous-review-loop
 
 From your project directory with an open PR, invoke the skill:
 
-```
+```text
 /reviewloop
 ```
 
@@ -64,11 +62,7 @@ The agent will autonomously:
 
 ### With Standalone Scripts
 
-Prompt your coding agent:
-
-```
-Please conduct the review loop as described in scripts/bash/reviewPrompt.txt
-```
+Copy `scripts/bash/` to your project directory, then prompt your coding agent with the contents of `.claude/skills/reviewloop/SKILL.md` (the section after the YAML frontmatter).
 
 ## Troubleshooting
 
@@ -99,7 +93,7 @@ gh auth login
 The default timeout is 10 minutes. If your CI takes longer, the script will inform you and you can re-run with a longer timeout:
 
 ```bash
-./scripts/review-wait.sh --timeout=1200
+./scripts/bash/review-wait.sh --timeout=1200
 ```
 
 ## Status
