@@ -1,9 +1,8 @@
-#!/usr/bin/env python3
 """
 Wait for the CodeRabbit CI action to complete on the current PR.
 If no CI is running, exits immediately.
 
-Usage: python scripts/review_wait.py [--timeout=600]
+Usage: uv run review-wait [--timeout=600]
 """
 
 import json

@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Fetch unresolved PR review comments from CodeRabbit and save to .reviews/prComments.md."""
 
 import json
