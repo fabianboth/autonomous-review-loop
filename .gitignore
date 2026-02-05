@@ -25,6 +25,9 @@ pnpm-debug.log*
 .DS_Store
 
 # IDE
-specs/
 .idea/
 .vscode/settings.json
+
+# Misc
+specs/
+.reviews/
