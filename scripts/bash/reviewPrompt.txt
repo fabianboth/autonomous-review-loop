@@ -19,10 +19,10 @@ Once CI completes:
 
 ### 3. Verify and commit
 1. Run `./scripts/bash/review-comments.sh` to verify no unresolved comments remain
-2. Run your project's linting and type checking commands to ensure code quality
+2. Run your project's linting and type-checking commands to ensure code quality
 3. Commit and push changes
 
 ### 4. Loop
 Go back to step 1 - wait for the next CodeRabbit review triggered by the push.
 
-**Exit condition**: When `./scripts/bash/review-comments.sh` shows no comments. Give a brief high level summary of what was addressed.
+**Exit condition**: When `./scripts/bash/review-comments.sh` shows no comments. Give a brief high-level summary of what was addressed.

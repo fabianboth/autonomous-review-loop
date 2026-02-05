@@ -25,11 +25,28 @@ get_pr_number() {
     echo "$pr_number"
 }
 
-get_coderabbit_check() {
+# Returns aggregated state: if any check is running, returns that state; otherwise returns the last state
+get_coderabbit_state() {
     local pr_number="$1"
-    local checks_json
+    local checks_json states
     checks_json=$(gh pr checks "$pr_number" --json name,state 2>&1) || die "Failed to fetch PR checks: $checks_json"
-    echo "$checks_json" | jq -r '.[] | select(.name | ascii_downcase | contains("coderabbit"))' 2>/dev/null
+
+    # Get all CodeRabbit check states
+    states=$(echo "$checks_json" | jq -r '[.[] | select(.name | ascii_downcase | contains("coderabbit")) | .state] | if length == 0 then "" else .[] end' 2>/dev/null)
+
+    [[ -z "$states" ]] && return
+
+    # If any state is a running state, return it (priority: running > completed)
+    local state
+    while IFS= read -r state; do
+        if is_running_state "$state"; then
+            echo "$state"
+            return
+        fi
+    done <<< "$states"
+
+    # No running states found, return the last state
+    echo "$states" | tail -n1
 }
 
 is_running_state() {
@@ -60,16 +77,15 @@ main() {
     parse_args "$@"
     check_dependencies
 
-    local pr_number check state start_time current_time elapsed
+    local pr_number state start_time current_time elapsed
     pr_number=$(get_pr_number)
 
     echo "Waiting ${INITIAL_DELAY}s for CI to start..."
     sleep "$INITIAL_DELAY"
 
-    check=$(get_coderabbit_check "$pr_number")
-    state=$(echo "$check" | jq -r '.state // ""')
+    state=$(get_coderabbit_state "$pr_number")
 
-    if [[ -z "$check" ]] || ! is_running_state "$state"; then
+    if [[ -z "$state" ]] || ! is_running_state "$state"; then
         echo "No CodeRabbit CI in progress"
         exit 0
     fi
@@ -87,10 +103,9 @@ main() {
             exit 1
         fi
 
-        check=$(get_coderabbit_check "$pr_number")
-        state=$(echo "$check" | jq -r '.state // ""')
+        state=$(get_coderabbit_state "$pr_number")
 
-        if [[ -z "$check" ]] || ! is_running_state "$state"; then
+        if [[ -z "$state" ]] || ! is_running_state "$state"; then
             echo ""
             echo "CodeRabbit CI completed${state:+ ($state)}"
             exit 0

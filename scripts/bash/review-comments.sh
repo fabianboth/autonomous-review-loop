@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-GRAPHQL_QUERY='query($owner: String!, $repo: String!, $pr: Int!) { repository(owner: $owner, name: $repo) { pullRequest(number: $pr) { reviews(first: 50) { nodes { id databaseId author { login } body reactions(first: 10) { nodes { user { login } content } } } } reviewThreads(first: 100) { nodes { id isResolved comments(first: 1) { nodes { author { login } path line body } } } } } } }'
+GRAPHQL_QUERY='query($owner: String!, $repo: String!, $pr: Int!) { repository(owner: $owner, name: $repo) { pullRequest(number: $pr) { reviews(first: 100) { nodes { id databaseId author { login } body reactions(first: 100) { nodes { user { login } content } } } } reviewThreads(first: 100) { nodes { id isResolved comments(first: 1) { nodes { author { login } path line body } } } } } } }'
 
 die() {
     echo "Error: $1" >&2
