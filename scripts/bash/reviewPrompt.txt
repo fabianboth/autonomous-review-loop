@@ -1,9 +1,9 @@
-## CodeRabbit Review Loop
+## Autonomous Review Loop
 
 This is an automated review loop. Follow these steps:
 
-### 1. Wait for CodeRabbit CI to complete
-Run `./scripts/bash/review-wait.sh` to poll for CodeRabbit CI completion.
+### 1. Wait for CI to complete
+Run `./scripts/bash/review-wait.sh` to poll for CI completion.
 - Waits 10s for CI to start (in case called right after push)
 - Polls every 15s until CI completes
 - Times out after 10 minutes (configurable with --timeout=SECONDS)
