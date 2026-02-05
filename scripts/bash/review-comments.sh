@@ -53,6 +53,7 @@ print_review() {
     [[ "$is_first" == "false" ]] && { echo ""; echo "---"; echo ""; }
 
     echo "**Review ID:** \`$(echo "$review" | jq -r '.id')\`"
+    echo "**Author:** $(echo "$review" | jq -r '.author // "unknown"')"
     echo ""
     echo "$review" | jq -r '.body // ""'
 }
@@ -75,12 +76,12 @@ main() {
 
     unresolved_threads=$(echo "$pr_data" | jq '[.reviewThreads.nodes[] | select(.isResolved == false and (.comments.nodes | length) > 0)]')
 
-    # Get CodeRabbit reviews user hasn't reacted to, strip HTML comments
+    # Get reviews user hasn't reacted to, strip HTML comments
     review_bodies=$(echo "$pr_data" | jq --arg user "$current_user" '
         [.reviews.nodes[]
-            | select(.author.login == "coderabbitai" and .body != null and .body != "")
+            | select(.body != null and .body != "")
             | select(([.reactions.nodes[] | select(.user.login == $user and .content == "THUMBS_UP")] | length) == 0)
-            | {id: .id, body: (.body | gsub("<!--[^>]*-->"; "") | gsub("^\\s+|\\s+$"; ""))}
+            | {id: .id, author: .author.login, body: (.body | gsub("<!--[^>]*-->"; "") | gsub("^\\s+|\\s+$"; ""))}
             | select(.body != "")
         ]')
 

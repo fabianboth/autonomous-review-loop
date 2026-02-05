@@ -26,13 +26,13 @@ get_pr_number() {
 }
 
 # Returns aggregated state: if any check is running, returns that state; otherwise returns the last state
-get_coderabbit_state() {
+get_ci_state() {
     local pr_number="$1"
     local checks_json states
     checks_json=$(gh pr checks "$pr_number" --json name,state 2>&1) || die "Failed to fetch PR checks: $checks_json"
 
-    # Get all CodeRabbit check states
-    states=$(echo "$checks_json" | jq -r '[.[] | select(.name | ascii_downcase | contains("coderabbit")) | .state] | if length == 0 then "" else .[] end' 2>/dev/null)
+    # Get all check states
+    states=$(echo "$checks_json" | jq -r '[.[] | .state] | if length == 0 then "" else .[] end' 2>/dev/null)
 
     [[ -z "$states" ]] && return
 
@@ -83,14 +83,14 @@ main() {
     echo "Waiting ${INITIAL_DELAY}s for CI to start..."
     sleep "$INITIAL_DELAY"
 
-    state=$(get_coderabbit_state "$pr_number")
+    state=$(get_ci_state "$pr_number")
 
     if [[ -z "$state" ]] || ! is_running_state "$state"; then
-        echo "No CodeRabbit CI in progress"
+        echo "No CI checks in progress"
         exit 0
     fi
 
-    echo "Waiting for CodeRabbit CI on PR #${pr_number}..."
+    echo "Waiting for CI checks on PR #${pr_number}..."
     start_time=$(date +%s)
 
     while true; do
@@ -103,11 +103,11 @@ main() {
             exit 1
         fi
 
-        state=$(get_coderabbit_state "$pr_number")
+        state=$(get_ci_state "$pr_number")
 
         if [[ -z "$state" ]] || ! is_running_state "$state"; then
             echo ""
-            echo "CodeRabbit CI completed${state:+ ($state)}"
+            echo "CI completed${state:+ ($state)}"
             exit 0
         fi
 
