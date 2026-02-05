@@ -17,26 +17,42 @@ The solution: delegate the entire review loop to your coding agent. It waits for
 - **Multi-pass resolution** - Iterates automatically until no unresolved comments remain
 - **Agent-agnostic** - Works with any coding agent (Claude Code, Cursor, etc.) and any review tool
 
-## Quick Start
+## Prerequisites
 
-### Prerequisites
-
+- [Claude Code](https://claude.com/code) - Anthropic's CLI for Claude
 - [GitHub CLI](https://cli.github.com/) (`gh`) - Authenticated with your account
 - [jq](https://jqlang.org/) - JSON processor
 
-### Installation
+## Installation
+
+### Option 1: Claude Code Skill (Recommended)
+
+Copy the skill directory to your project:
+
+```bash
+# From the autonomous-review-loop repository
+cp -r .claude/skills/reviewloop /path/to/your/project/.claude/skills/
+```
+
+Or if you want the skill available in your project, copy the entire `.claude/skills/reviewloop/` directory to your project's `.claude/skills/` folder.
+
+### Option 2: Standalone Scripts
+
+If you're not using Claude Code, you can use the scripts directly:
 
 ```bash
 git clone https://github.com/fabianboth/autonomous-review-loop.git
 cd autonomous-review-loop
 ```
 
-### Usage
+## Usage
 
-From your project directory with an open PR, prompt your coding agent:
+### With Claude Code Skill
+
+From your project directory with an open PR, invoke the skill:
 
 ```
-Please conduct the review loop as described in scripts/bash/reviewPrompt.txt
+/reviewloop
 ```
 
 The agent will autonomously:
@@ -45,6 +61,46 @@ The agent will autonomously:
 3. Fix valid issues, ask you about ambiguous ones
 4. Resolve threads and push
 5. Repeat until no comments remain
+
+### With Standalone Scripts
+
+Prompt your coding agent:
+
+```
+Please conduct the review loop as described in scripts/bash/reviewPrompt.txt
+```
+
+## Troubleshooting
+
+### "No PR found for current branch"
+
+Ensure you're on a branch with an open PR:
+
+```bash
+gh pr view
+```
+
+### "gh CLI is not authenticated"
+
+Run:
+
+```bash
+gh auth login
+```
+
+### Skill not appearing in Claude Code
+
+1. Check the skill file exists: `.claude/skills/reviewloop/SKILL.md`
+2. Verify the frontmatter is valid YAML
+3. Restart Claude Code
+
+### CI timeout
+
+The default timeout is 10 minutes. If your CI takes longer, the script will inform you and you can re-run with a longer timeout:
+
+```bash
+./scripts/review-wait.sh --timeout=1200
+```
 
 ## Status
 

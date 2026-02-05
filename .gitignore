@@ -1,5 +1,6 @@
 # build output
 dist/
+.ruff_cache
 
 # dependencies
 node_modules/
