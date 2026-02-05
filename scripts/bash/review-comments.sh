@@ -22,22 +22,39 @@ get_pr_number() {
 }
 
 get_repo_info() {
-    local repo_json
-    repo_json=$(gh repo view --json owner,name 2>&1) || die "Failed to get repository info: $repo_json"
-    echo "$repo_json"
+    gh repo view --json owner,name 2>&1 || die "Failed to get repository info"
 }
 
 get_current_user() {
-    local user
-    user=$(gh api user -q '.login' 2>&1) || die "Failed to get current user: $user"
-    echo "$user"
+    gh api user -q '.login' 2>&1 || die "Failed to get current user"
 }
 
 run_graphql() {
     local owner="$1" repo="$2" pr="$3"
-    local result
-    result=$(gh api graphql -F "owner=$owner" -F "repo=$repo" -F "pr=$pr" -f "query=$GRAPHQL_QUERY" 2>&1) || die "GraphQL query failed: $result"
-    echo "$result"
+    gh api graphql -F "owner=$owner" -F "repo=$repo" -F "pr=$pr" -f "query=$GRAPHQL_QUERY" 2>&1 || die "GraphQL query failed"
+}
+
+print_thread() {
+    local thread="$1" is_first="$2"
+
+    [[ "$is_first" == "false" ]] && { echo ""; echo "---"; echo ""; }
+
+    echo "## $(echo "$thread" | jq -r '.comments.nodes[0].path // "unknown"'):$(echo "$thread" | jq -r '.comments.nodes[0].line // "?"')"
+    echo ""
+    echo "**Thread ID:** \`$(echo "$thread" | jq -r '.id')\`"
+    echo "**Author:** $(echo "$thread" | jq -r '.comments.nodes[0].author.login // "unknown"')"
+    echo ""
+    echo "$thread" | jq -r '.comments.nodes[0].body // ""'
+}
+
+print_review() {
+    local review="$1" is_first="$2"
+
+    [[ "$is_first" == "false" ]] && { echo ""; echo "---"; echo ""; }
+
+    echo "**Review ID:** \`$(echo "$review" | jq -r '.id')\`"
+    echo ""
+    echo "$review" | jq -r '.body // ""'
 }
 
 main() {
@@ -54,26 +71,19 @@ main() {
     result=$(run_graphql "$owner" "$repo" "$pr_number")
     pr_data=$(echo "$result" | jq '.data.repository.pullRequest')
 
-    local coderabbit_reviews unreacted_reviews unresolved_threads review_bodies
-    coderabbit_reviews=$(echo "$pr_data" | jq '[.reviews.nodes[] | select(.author.login == "coderabbitai" and .body != null and .body != "")]')
-
-    unreacted_reviews=$(echo "$coderabbit_reviews" | jq --arg user "$current_user" '[
-        .[] | select(
-            ([.reactions.nodes[] | select(.user.login == $user and .content == "THUMBS_UP")] | length) == 0
-        )
-    ]')
+    local unresolved_threads review_bodies thread_count review_count
 
     unresolved_threads=$(echo "$pr_data" | jq '[.reviewThreads.nodes[] | select(.isResolved == false and (.comments.nodes | length) > 0)]')
 
-    # Strip HTML comments from review bodies
-    review_bodies=$(echo "$unreacted_reviews" | jq '[.[] | {id: .id, body: .body}]')
-    review_bodies=$(echo "$review_bodies" | jq '[
-        .[] |
-        .body |= (gsub("<!--[^>]*-->"; "") | gsub("^\\s+|\\s+$"; "")) |
-        select(.body != "")
-    ]')
+    # Get CodeRabbit reviews user hasn't reacted to, strip HTML comments
+    review_bodies=$(echo "$pr_data" | jq --arg user "$current_user" '
+        [.reviews.nodes[]
+            | select(.author.login == "coderabbitai" and .body != null and .body != "")
+            | select(([.reactions.nodes[] | select(.user.login == $user and .content == "THUMBS_UP")] | length) == 0)
+            | {id: .id, body: (.body | gsub("<!--[^>]*-->"; "") | gsub("^\\s+|\\s+$"; ""))}
+            | select(.body != "")
+        ]')
 
-    local thread_count review_count
     thread_count=$(echo "$unresolved_threads" | jq 'length')
     review_count=$(echo "$review_bodies" | jq 'length')
 
@@ -95,22 +105,24 @@ EOF
     local react_cmd='gh api graphql -f query='\''mutation { addReaction(input: {subjectId: "REVIEW_ID", content: THUMBS_UP}) { reaction { content } } }'\'''
 
     {
-        echo "# Review Comments"
-        echo ""
-        echo "**PR:** #${pr_number}"
-        echo "**Inline threads (unresolved):** ${thread_count}"
-        echo "**Review comments (unreacted):** ${review_count}"
-        echo ""
-        echo "To resolve an inline thread after addressing it:"
-        echo '```bash'
-        echo "$resolve_cmd"
-        echo '```'
-        echo ""
-        echo "To mark a review as addressed (adds reaction):"
-        echo '```bash'
-        echo "$react_cmd"
-        echo '```'
-        echo ""
+        cat << EOF
+# Review Comments
+
+**PR:** #${pr_number}
+**Inline threads (unresolved):** ${thread_count}
+**Review comments (unreacted):** ${review_count}
+
+To resolve an inline thread after addressing it:
+\`\`\`bash
+${resolve_cmd}
+\`\`\`
+
+To mark a review as addressed (adds reaction):
+\`\`\`bash
+${react_cmd}
+\`\`\`
+
+EOF
 
         if [[ "$thread_count" -gt 0 ]]; then
             echo "---"
@@ -118,28 +130,11 @@ EOF
             echo "# Inline Comments (Unresolved)"
             echo ""
 
-            local i=0
-            while [[ $i -lt $thread_count ]]; do
-                local thread thread_id comment path line author body
-                thread=$(echo "$unresolved_threads" | jq ".[$i]")
-                thread_id=$(echo "$thread" | jq -r '.id')
-                comment=$(echo "$thread" | jq '.comments.nodes[0]')
-                path=$(echo "$comment" | jq -r '.path // "unknown"')
-                line=$(echo "$comment" | jq -r '.line // "?"')
-                author=$(echo "$comment" | jq -r '.author.login // "unknown"')
-                body=$(echo "$comment" | jq -r '.body // ""')
-
-                [[ $i -gt 0 ]] && { echo ""; echo "---"; echo ""; }
-
-                echo "## ${path}:${line}"
-                echo ""
-                echo "**Thread ID:** \`${thread_id}\`"
-                echo "**Author:** ${author}"
-                echo ""
-                echo "$body"
-
-                ((i++))
-            done
+            local is_first=true
+            while IFS= read -r thread; do
+                print_thread "$thread" "$is_first"
+                is_first=false
+            done < <(echo "$unresolved_threads" | jq -c '.[]')
         fi
 
         if [[ "$review_count" -gt 0 ]]; then
@@ -149,21 +144,11 @@ EOF
             echo "# Review Comments (${review_count})"
             echo ""
 
-            local i=0
-            while [[ $i -lt $review_count ]]; do
-                local review review_id body
-                review=$(echo "$review_bodies" | jq ".[$i]")
-                review_id=$(echo "$review" | jq -r '.id')
-                body=$(echo "$review" | jq -r '.body // ""')
-
-                [[ $i -gt 0 ]] && { echo ""; echo "---"; echo ""; }
-
-                echo "**Review ID:** \`${review_id}\`"
-                echo ""
-                echo "$body"
-
-                ((i++))
-            done
+            local is_first=true
+            while IFS= read -r review; do
+                print_review "$review" "$is_first"
+                is_first=false
+            done < <(echo "$review_bodies" | jq -c '.[]')
         fi
     } > .reviews/prComments.md
 

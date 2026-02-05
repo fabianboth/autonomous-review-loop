@@ -5,7 +5,7 @@ set -euo pipefail
 INITIAL_DELAY=10
 POLL_INTERVAL=15
 DEFAULT_TIMEOUT=600
-RUNNING_STATES="pending in_progress queued waiting requested"
+RUNNING_STATES=(pending in_progress queued waiting requested)
 
 die() {
     echo "Error: $1" >&2
@@ -33,18 +33,20 @@ get_coderabbit_check() {
 }
 
 is_running_state() {
-    local state="$1"
-    for s in $RUNNING_STATES; do
-        [[ "${state,,}" == "$s" ]] && return 0
+    local state="${1,,}"
+    local s
+    for s in "${RUNNING_STATES[@]}"; do
+        [[ "$state" == "$s" ]] && return 0
     done
     return 1
 }
 
 parse_args() {
     TIMEOUT=$DEFAULT_TIMEOUT
+    local arg value
     for arg in "$@"; do
         if [[ "$arg" == --timeout=* ]]; then
-            local value="${arg#--timeout=}"
+            value="${arg#--timeout=}"
             if [[ "$value" =~ ^[0-9]+$ ]] && [[ "$value" -gt 0 ]]; then
                 TIMEOUT="$value"
             else
@@ -58,35 +60,24 @@ main() {
     parse_args "$@"
     check_dependencies
 
-    local pr_number
+    local pr_number check state start_time current_time elapsed
     pr_number=$(get_pr_number)
 
     echo "Waiting ${INITIAL_DELAY}s for CI to start..."
     sleep "$INITIAL_DELAY"
 
-    local initial_check
-    initial_check=$(get_coderabbit_check "$pr_number")
+    check=$(get_coderabbit_check "$pr_number")
+    state=$(echo "$check" | jq -r '.state // ""')
 
-    if [[ -z "$initial_check" ]]; then
-        echo "No CodeRabbit CI in progress"
-        exit 0
-    fi
-
-    local initial_state
-    initial_state=$(echo "$initial_check" | jq -r '.state // ""')
-
-    if ! is_running_state "$initial_state"; then
+    if [[ -z "$check" ]] || ! is_running_state "$state"; then
         echo "No CodeRabbit CI in progress"
         exit 0
     fi
 
     echo "Waiting for CodeRabbit CI on PR #${pr_number}..."
-
-    local start_time
     start_time=$(date +%s)
 
     while true; do
-        local current_time elapsed
         current_time=$(date +%s)
         elapsed=$((current_time - start_time))
 
@@ -96,20 +87,12 @@ main() {
             exit 1
         fi
 
-        local check state
         check=$(get_coderabbit_check "$pr_number")
-
-        if [[ -z "$check" ]]; then
-            echo ""
-            echo "CodeRabbit CI completed"
-            exit 0
-        fi
-
         state=$(echo "$check" | jq -r '.state // ""')
 
-        if ! is_running_state "$state"; then
+        if [[ -z "$check" ]] || ! is_running_state "$state"; then
             echo ""
-            echo "CodeRabbit CI completed ($state)"
+            echo "CodeRabbit CI completed${state:+ ($state)}"
             exit 0
         fi
 
