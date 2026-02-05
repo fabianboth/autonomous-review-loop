@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# ruff: noqa: T201, S603, S607
 """Fetch unresolved PR review comments from CodeRabbit and save to .reviews/prComments.md."""
 
 import json
@@ -171,7 +170,7 @@ To mark a review as addressed (adds reaction):
 
     if unresolved_threads:
         output += "---\n\n# Inline Comments (Unresolved)\n\n"
-        thread_parts = []
+        thread_parts: list[str] = []
         for t in unresolved_threads:
             comment = t["comments"]["nodes"][0]
             location = f"{comment['path']}:{comment.get('line', '?')}"
@@ -195,6 +194,6 @@ To mark a review as addressed (adds reaction):
 if __name__ == "__main__":
     try:
         main()
-    except Exception as e:  # noqa: BLE001
+    except Exception as e:
         print(f"Error: {e}", file=sys.stderr)
         sys.exit(1)

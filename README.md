@@ -17,6 +17,49 @@ The solution: delegate the entire review loop to your coding agent. It waits for
 - **Multi-pass resolution** - Iterates automatically until no unresolved comments remain
 - **Agent-agnostic** - Works with any coding agent (Claude Code, Cursor, etc.) and any review agent (CodeRabbit, etc.)
 
+## Quick Start
+
+### Prerequisites
+
+- [uv](https://docs.astral.sh/uv/) - Python package manager
+- [GitHub CLI](https://cli.github.com/) (`gh`) - Authenticated with your account
+
+### Installation
+
+```bash
+# Install uv (if not already installed)
+curl -LsSf https://astral.sh/uv/install.sh | sh  # macOS/Linux
+# or: powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"  # Windows
+
+# Clone and setup
+git clone https://github.com/fabianvf/agentic-review-loop.git
+cd agentic-review-loop
+uv sync
+```
+
+### Usage
+
+```bash
+# Wait for CodeRabbit CI to complete
+uv run review-wait
+
+# Fetch unresolved PR comments
+uv run review-comments
+```
+
+## Development
+
+```bash
+# Type checking
+uv run pyright scripts/python/
+
+# Linting
+uv run ruff check scripts/python/
+
+# Formatting
+uv run ruff format scripts/python/
+```
+
 ## Status
 
 Currently in active development.

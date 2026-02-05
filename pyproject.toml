@@ -1,0 +1,76 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "agentic-review-loop"
+version = "0.1.0"
+description = "Autonomous review loop - automates the review-fix-push cycle"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = []
+
+[project.scripts]
+review-wait = "scripts.python.review_wait:main"
+review-comments = "scripts.python.review_comments:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["scripts"]
+
+[dependency-groups]
+dev = [
+    "pyright>=1.1.408",
+    "ruff>=0.15.0",
+]
+
+[tool.pyright]
+pythonVersion = "3.13"
+typeCheckingMode = "strict"
+include = ["scripts/python"]
+exclude = ["**/__pycache__", ".venv"]
+reportPrivateUsage = false
+reportOverlappingOverload = true
+reportUninitializedInstanceVariable = true
+reportUnnecessaryTypeIgnoreComment = true
+reportDeprecated = "warning"
+
+[tool.ruff]
+target-version = "py313"
+line-length = 120
+fix = true
+src = ["scripts"]
+extend-exclude = [".venv", "specs", ".specify"]
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = [
+    "D",       # docstrings - too strict for CLI scripts
+    "COM812",  # trailing comma - conflicts with formatter
+    "ISC001",  # implicit string concat - conflicts with formatter
+    "EM101",   # exception message - allow inline strings
+    "EM102",   # exception message f-string
+    "TRY003",  # long exception messages
+    "PLR0913", # too many arguments
+    "FBT001",  # boolean positional arg
+    "FBT002",  # boolean default arg
+    "G004",    # logging f-string
+    "RET504",  # unnecessary assignment before return
+    "RET505",  # unnecessary else after return
+    "PLR2004", # magic values
+]
+unfixable = ["F401"]
+
+[tool.ruff.lint.per-file-ignores]
+"scripts/**" = [
+    "INP001",  # implicit namespace package
+    "T201",    # print statements (expected in CLI)
+    "S603",    # subprocess call
+    "S607",    # partial executable path
+    "BLE001",  # blind exception
+]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "lf"
