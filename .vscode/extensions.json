@@ -1,4 +1,4 @@
 {
-  "recommendations": ["biomejs.biome"],
+  "recommendations": ["charliermarsh.ruff", "ms-pyright.pyright"],
   "unwantedRecommendations": []
 }
