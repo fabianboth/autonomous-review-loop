@@ -10,26 +10,58 @@ Autonomous Review Loop - a workflow tool that automates the review-fix-push cycl
 
 ```
 /
+├── pyproject.toml        # Project configuration (uv, pyright, ruff)
+├── uv.lock               # Dependency lock file
 ├── scripts/
-│   ├── typescript/       # TypeScript implementation
-│   │   ├── review-wait.mjs
-│   │   ├── review-comments.mjs
+│   ├── python/           # Python implementation (primary)
+│   │   ├── review_wait.py
+│   │   ├── review_comments.py
 │   │   └── reviewPrompt.txt
-│   └── python/           # Python implementation
-│       ├── review_wait.py
-│       ├── review_comments.py
+│   └── typescript/       # TypeScript implementation (reference)
+│       ├── review-wait.mjs
+│       ├── review-comments.mjs
 │       └── reviewPrompt.txt
 └── specs/                # Feature specifications
 ```
 
 ## Tech Stack
 
-- **TypeScript**: Node.js scripts (.mjs)
-- **Python**: Python 3.x scripts
-- **Linting/Formatting**: Biome (for .ts, .js, .json)
+- **Python**: 3.13+ with uv for dependency management
+- **Type Checking**: pyright (strict mode)
+- **Linting/Formatting**: ruff (ALL rules with sensible ignores)
+- **TypeScript**: Node.js scripts (.mjs) - retained for reference
+
+## Commands
+
+```bash
+uv sync
+
+# Run scripts
+uv run review-wait       # Wait for CodeRabbit CI
+uv run review-comments   # Fetch PR comments
+
+# Linting (auto-fixes enabled via pyproject.toml)
+uv run ruff check
+uv run ruff format
+
+# Type checking (strict mode)
+uv run pyright
+```
 
 ## Code Style
 
-- TypeScript: ES modules, strict typing (no `any`)
-- Python: Type hints encouraged
-- Biome enforced: tabs, double quotes, semicolons
+- Python 3.13+, line length 120, double quotes
+- Self-explaining modular code: We strive for self explaining, comment free code without docstrings (only comments in rare exceptions)
+- Strict type hints (pyright strict mode) - all methods must be typed
+- Prefer kwargs when calling methods for clarity
+- Use dataclasses for structured data
+- Never suppress type/lint errors - fix them (rare exceptions only)
+- Avoid creating barrel exports via init files, always directly import instead
+
+## Change Verification
+
+Always used to verify code changes:
+
+- Format code with `uv run ruff format`
+- Verify changes with `uv run ruff check`
+- Verify type checking with `uv run pyright`

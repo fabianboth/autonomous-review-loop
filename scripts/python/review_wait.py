@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# ruff: noqa: T201, S603, S607
 """
 Wait for the CodeRabbit CI action to complete on the current PR.
 If no CI is running, exits immediately.
@@ -111,6 +110,6 @@ def main() -> None:
 if __name__ == "__main__":
     try:
         main()
-    except Exception as e:  # noqa: BLE001
+    except Exception as e:
         print(f"Error: {e}", file=sys.stderr)
         sys.exit(1)
