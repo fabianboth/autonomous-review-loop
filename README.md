@@ -1,5 +1,7 @@
 # Autonomous Review Loop
 
+![Autonomous Review Loop](assets/review_loop.webp)
+
 A workflow tool that automates the review-fix-push cycle by delegating to your coding agent.
 
 ## Why
