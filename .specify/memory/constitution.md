@@ -2,39 +2,21 @@
 
 ## Core Principles
 
-### I. Agent-Agnostic Design
-The tool must work with any coding agent (Claude Code, Cursor, etc.) and any review agent (CodeRabbit, etc.). Avoid tight coupling to specific platforms.
+### I. MVP approach
+Focus on a core set of features creating a lean but useful core value loop for the user. Avoid feature creep; do one thing well. If a feature doesn't directly contribute to the core value proposition, it should be deferred.
 
-### II. Dual Implementation Parity
-Maintain feature parity between TypeScript and Python implementations. Both should behave identically and be equally well-maintained.
+### II. Modern & Clean Code
+Code must be clean, readable, type-safe, and linted. We avoid legacy patterns and embrace the "bleeding edge" where it offers stability and improved DX.
 
-### III. Simplicity & Reliability
-Keep scripts focused and reliable. The tool runs in CI/automation contexts where failures are costly. Prefer clear error messages over silent failures.
+### III. Automated Verification
+All changes must pass automated checks (lint, typecheck, test). New features should include tests where applicable. We value confidence in our deployments; automation is the key to maintaining velocity without sacrificing quality.
 
-### IV. Minimal Dependencies
-Keep dependencies minimal in both implementations. The tool should be easy to install and run without complex setup.
-
-## Technology Standards
-
-### Stack & Tools
-- **TypeScript**: Node.js ES modules (.mjs)
-- **Python**: Python 3.x with type hints
-- **Linting/Formatting**: Biome (for JS/TS/JSON)
-
-### Implementation Constraints
-- TypeScript: Strict typing, no `any`
-- Python: Type hints encouraged
-- Both: Clear CLI interfaces, meaningful exit codes
-
-## Development Workflow
+### IV. Reusable Components
+Prefer reusing existing components and code, creating well maintainable, modular and reusable code with good interfaces.
 
 ### Code Style
-- Biome enforced: tabs, double quotes, semicolons (TS/JS)
+- Enforced strict typing / linting / typechecking
 - Keep functions small and focused
 - Prefer composition over complexity
-
-### Verification
-- Test both implementations when making changes
-- Ensure scripts handle edge cases (no PR, no comments, API failures)
 
 **Version**: 1.0.0 | **Ratified**: 2025-02-05

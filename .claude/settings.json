@@ -16,9 +16,6 @@
       "Bash(git push -f:*)"
     ],
     "ask": [
-      "Bash(pnpm prisma migrate:*)",
-      "Bash(pnpm prisma:*)",
-      "Bash(pnpm release:*)",
       "Bash(rm:*)",
       "Bash(rmdir:*)",
       "Bash(del:*)",
