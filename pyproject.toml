@@ -8,7 +8,7 @@ version = "0.1.0"
 description = "Autonomous review loop - automates the review-fix-push cycle"
 readme = "README.md"
 requires-python = ">=3.13"
-dependencies = ["typer"]
+dependencies = ["typer", "rich", "readchar"]
 
 [project.scripts]
 reviewloop = "reviewloop_cli.cli:main"

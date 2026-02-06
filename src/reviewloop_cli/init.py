@@ -8,7 +8,14 @@ from importlib.resources import as_file, files
 from pathlib import Path
 from typing import Annotated
 
+import readchar
 import typer
+from rich.console import Console
+from rich.live import Live
+from rich.panel import Panel
+from rich.table import Table
+
+console = Console()
 
 
 class InitMode(StrEnum):
@@ -98,6 +105,7 @@ def _init_script(target_dir: Path, templates: Path) -> list[str]:
 
     skill_content = (templates / "SKILL.md").read_text(encoding="utf-8")
     prompt_content = _strip_frontmatter(skill_content)
+    prompt_content = prompt_content.replace(".claude/skills/reviewloop/scripts/", "scripts/reviewloop/")
     prompt_path = scripts_dir / "reviewPrompt.txt"
     prompt_path.write_text(prompt_content, encoding="utf-8")
     created.append(str(prompt_path))
@@ -112,12 +120,64 @@ def _print_summary(created_files: list[str], target_dir: Path) -> None:
         print(f"  {f}")
 
 
+def _get_key() -> str:
+    key = readchar.readkey()
+    if key in (readchar.key.UP, readchar.key.CTRL_P):
+        return "up"
+    if key in (readchar.key.DOWN, readchar.key.CTRL_N):
+        return "down"
+    if key == readchar.key.ENTER:
+        return "enter"
+    if key == readchar.key.ESC:
+        return "escape"
+    if key == readchar.key.CTRL_C:
+        raise KeyboardInterrupt
+    return key
+
+
+def _select_with_arrows(options: dict[str, str], title: str, default: str | None = None) -> str:
+    keys = list(options.keys())
+    selected = keys.index(default) if default and default in keys else 0
+
+    def _build_panel() -> Panel:
+        table = Table.grid(padding=(0, 2))
+        table.add_column(width=3)
+        table.add_column()
+        for i, key in enumerate(keys):
+            marker = "[cyan]\u25b6[/cyan]" if i == selected else " "
+            label = f"[bold cyan]{key}[/bold cyan]" if i == selected else f"[dim]{key}[/dim]"
+            table.add_row(marker, f"{label}  [dim]{options[key]}[/dim]")
+        table.add_row("", "")
+        table.add_row("", "[dim]\u2191/\u2193 navigate, Enter select, Esc cancel[/dim]")
+        return Panel(table, title=f"[bold]{title}[/bold]", border_style="cyan", padding=(1, 2))
+
+    console.print()
+    with Live(_build_panel(), console=console, transient=True, auto_refresh=False) as live:
+        while True:
+            try:
+                key = _get_key()
+            except KeyboardInterrupt:
+                console.print("[yellow]Cancelled[/yellow]")
+                raise typer.Exit(code=1) from None
+            if key == "up":
+                selected = (selected - 1) % len(keys)
+            elif key == "down":
+                selected = (selected + 1) % len(keys)
+            elif key == "enter":
+                return keys[selected]
+            elif key == "escape":
+                console.print("[yellow]Cancelled[/yellow]")
+                raise typer.Exit(code=1)
+            live.update(_build_panel(), refresh=True)
+
+
 def _prompt_mode() -> InitMode:
-    print("\nInitialization mode:")
-    print("  1) Claude Code  - installs as a Claude Code skill")
-    print("  2) Script based - creates standalone scripts + prompt file")
-    choice = typer.prompt("Select mode", type=int, default=1)
-    if choice == 2:
+    choices = {
+        "Claude Code": "installs as a Claude Code skill",
+        "Script based": "creates standalone scripts + prompt file",
+    }
+    selected = _select_with_arrows(choices, "Initialization mode", default="Claude Code")
+    if selected == "Script based":
         return InitMode.SCRIPT
     return InitMode.CLAUDE_CODE
 
