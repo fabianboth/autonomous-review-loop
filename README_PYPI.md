@@ -1,8 +1,20 @@
-# Autonomous Review Loop
+<div align="center">
+    <img src="https://raw.githubusercontent.com/fabianboth/autonomous-review-loop/main/assets/review_loop.webp" alt="Autonomous Review Loop" width="200"/>
+    <h1>Autonomous Review Loop</h1>
+    <h3><em>Automate the review-fix-push cycle.</em></h3>
+</div>
 
-![Autonomous Review Loop](https://raw.githubusercontent.com/fabianboth/autonomous-review-loop/main/assets/review_loop.webp)
+<p align="center">
+    <strong>Pair your review bot with your coding agent — <code>reviewloop</code> delegates the entire review-fix-push cycle so you only step in when human judgment is needed.</strong>
+</p>
 
-Pair your review bot ([CodeRabbit](https://www.coderabbit.ai/), [Cursor BugBot](https://cursor.com/bugbot), etc.) with your coding agent. `reviewloop` delegates the entire review-fix-push cycle: it fetches comments, fixes issues, resolves threads, pushes, and repeats. You only step in when human judgment is needed.
+<p align="center">
+    <a href="https://github.com/fabianboth/autonomous-review-loop/actions/workflows/ci.yml"><img src="https://github.com/fabianboth/autonomous-review-loop/actions/workflows/ci.yml/badge.svg" alt="CI"/></a>
+    <a href="https://pypi.org/project/reviewloop/"><img src="https://img.shields.io/pypi/v/reviewloop" alt="PyPI version"/></a>
+    <a href="https://github.com/fabianboth/autonomous-review-loop/blob/main/LICENSE"><img src="https://img.shields.io/github/license/fabianboth/autonomous-review-loop" alt="License"/></a>
+</p>
+
+---
 
 ## Installation
 
