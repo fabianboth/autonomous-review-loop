@@ -1,5 +1,5 @@
 <div align="center">
-    <img src="https://raw.githubusercontent.com/fabianboth/autonomous-review-loop/main/assets/review_loop.webp" alt="Autonomous Review Loop" width="200"/>
+    <img src="https://raw.githubusercontent.com/fabianboth/autonomous-review-loop/main/assets/review_loop.webp" alt="Autonomous Review Loop" width="450"/>
     <h1>Autonomous Review Loop</h1>
     <h3><em>Automate the review-fix-push cycle.</em></h3>
 </div>
