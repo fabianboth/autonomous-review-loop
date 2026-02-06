@@ -8,27 +8,15 @@ Autonomous Review Loop - a workflow tool that automates the review-fix-push cycl
 
 ## Project Structure
 
-```
-/
-├── pyproject.toml        # Project configuration (uv, pyright, ruff)
-├── uv.lock               # Dependency lock file
-├── src/
-│   └── reviewloop_cli/   # CLI package (typer-based)
-│       ├── __init__.py
-│       └── cli.py        # App, commands, entry point
-├── scripts/
-│   └── bash/             # Review loop scripts
-│       ├── review-wait.sh
-│       ├── review-comments.sh
-│       └── reviewPrompt.txt
-└── specs/                # Feature specifications
-```
+- `src/reviewloop_cli/` — CLI package (typer-based), entry point in `cli.py`
+- `src/reviewloop_cli/templates/` — Bundled template files (bash scripts, SKILL.md) — single source of truth for `reviewloop init`
+- `specs/` — Feature specifications (speckit-managed)
 
 ## Tech Stack
 
-- **Bash**: 4.0+ for review loop scripts
 - **Python**: 3.13+ with uv (CLI package + project tooling)
-- **CLI Framework**: typer
+- **Bash**: 4.0+ for review loop scripts (bundled in `src/reviewloop_cli/templates/`)
+- **CLI Framework**: typer, readchar (interactive selection)
 - **Linting/Formatting**: ruff
 - **Type Checking**: pyright (strict mode)
 

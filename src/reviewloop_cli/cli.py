@@ -3,12 +3,15 @@ from typing import Annotated
 
 import typer
 
+from reviewloop_cli.init import init as init_command
+
 app = typer.Typer(
     name="reviewloop",
     help="Autonomous review loop - automates the review-fix-push cycle.",
     add_completion=False,
     invoke_without_command=True,
 )
+app.command(name="init", help="Initialize reviewloop in a project.")(init_command)
 
 
 def _version_callback(value: bool) -> None:
