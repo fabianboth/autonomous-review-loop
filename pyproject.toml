@@ -7,8 +7,29 @@ name = "reviewloop"
 version = "0.1.0"
 description = "Autonomous review loop - automates the review-fix-push cycle"
 readme = "README.md"
+license = "MIT"
 requires-python = ">=3.13"
+authors = [
+    { name = "Fabian Both" },
+]
+keywords = ["code-review", "automation", "cli", "developer-tools", "ai"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Quality Assurance",
+    "Typing :: Typed",
+]
 dependencies = ["typer", "rich", "readchar"]
+
+[project.urls]
+Homepage = "https://github.com/fabianboth/autonomous-review-loop"
+Repository = "https://github.com/fabianboth/autonomous-review-loop.git"
+Issues = "https://github.com/fabianboth/autonomous-review-loop/issues"
 
 [project.scripts]
 reviewloop = "reviewloop_cli.cli:main"
