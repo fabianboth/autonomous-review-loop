@@ -2,7 +2,12 @@
 
 ![Autonomous Review Loop](assets/review_loop.webp)
 
-Pair your review bot ([CodeRabbit](https://www.coderabbit.ai/), [Cursor BugBot](https://cursor.com/bugbot), etc.) with your coding agent. reviewloop delegates the entire review-fix-push cycle: it fetches comments, fixes issues, resolves threads, pushes, and repeats. You only step in when human judgment is needed.
+Pair your review bot ([CodeRabbit](https://www.coderabbit.ai/), [Cursor BugBot](https://cursor.com/bugbot), etc.) with your coding agent. `reviewloop` delegates the entire review-fix-push cycle: it fetches comments, fixes issues, resolves threads, pushes, and repeats. You only step in when human judgment is needed.
+
+## Prerequisites
+
+- [GitHub CLI](https://cli.github.com/) (`gh`), authenticated with your account
+- [jq](https://jqlang.org/)
 
 ## Installation
 
@@ -14,16 +19,11 @@ uv tool install reviewloop
 reviewloop init
 ```
 
-### Prerequisites
-
-- [GitHub CLI](https://cli.github.com/) (`gh`), authenticated with your account
-- [jq](https://jqlang.org/)
-
 ## Getting Started
 
 ### Claude Code
 
-Select **Claude Code** during `reviewloop init`. Then invoke the skill from your project directory with an open PR:
+Select **Claude Code** during `reviewloop init`. Then run this within your claude code session:
 
 ```text
 /reviewloop
@@ -37,7 +37,7 @@ Select **Script based** during `reviewloop init`. This creates standalone script
 
 1. Waits for CI to complete
 2. Fetches inline comments and review comments
-3. Fixes valid issues, asks you about ambiguous ones
+3. Fixes valid issues and asks you about ambiguous ones
 4. Resolves threads and pushes
 5. Repeats until no unresolved comments remain
 
