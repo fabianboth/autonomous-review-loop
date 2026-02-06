@@ -3,19 +3,18 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "agentic-review-loop"
+name = "reviewloop"
 version = "0.1.0"
 description = "Autonomous review loop - automates the review-fix-push cycle"
 readme = "README.md"
 requires-python = ">=3.13"
-dependencies = []
+dependencies = ["typer"]
 
 [project.scripts]
-review-wait = "scripts.python.review_wait:main"
-review-comments = "scripts.python.review_comments:main"
+reviewloop = "reviewloop_cli.cli:main"
 
 [tool.hatch.build.targets.wheel]
-packages = ["scripts"]
+packages = ["src/reviewloop_cli"]
 
 [dependency-groups]
 dev = [
@@ -26,7 +25,7 @@ dev = [
 [tool.pyright]
 pythonVersion = "3.13"
 typeCheckingMode = "strict"
-include = ["scripts/python"]
+include = ["src/reviewloop_cli"]
 exclude = ["**/__pycache__", ".venv"]
 reportPrivateUsage = false
 reportOverlappingOverload = true
@@ -38,7 +37,7 @@ reportDeprecated = "warning"
 target-version = "py313"
 line-length = 120
 fix = true
-src = ["scripts"]
+src = ["scripts", "src"]
 extend-exclude = [".venv", "specs", ".specify"]
 
 [tool.ruff.lint]
@@ -67,6 +66,9 @@ unfixable = ["F401"]
     "S603",    # subprocess call
     "S607",    # partial executable path
     "BLE001",  # blind exception
+]
+"src/**" = [
+    "T201",    # print statements (expected in CLI)
 ]
 
 [tool.ruff.format]
