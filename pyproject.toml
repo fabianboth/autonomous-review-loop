@@ -6,7 +6,7 @@ build-backend = "hatchling.build"
 name = "reviewloop"
 version = "0.1.0"
 description = "Autonomous review loop - automates the review-fix-push cycle"
-readme = "README.md"
+readme = "README_PYPI.md"
 license = "MIT"
 requires-python = ">=3.13"
 authors = [
