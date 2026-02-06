@@ -5,7 +5,7 @@
 </div>
 
 <p align="center">
-    <strong>Pair your review bot with your coding agent — <code>reviewloop</code> delegates the entire review-fix-push cycle so you only step in when human judgment is needed.</strong>
+    <strong>Pair your review bot with your coding agent: <code>reviewloop</code> delegates the entire review-fix-push cycle so you only step in when human judgment is needed.</strong>
 </p>
 
 <p align="center">
