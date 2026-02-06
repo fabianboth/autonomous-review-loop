@@ -18,6 +18,7 @@
 
 ## Prerequisites
 
+- [Python](https://www.python.org/) 3.12+
 - [GitHub CLI](https://cli.github.com/) (`gh`), authenticated with your account
 - [jq](https://jqlang.org/), for JSON parsing within bash
 

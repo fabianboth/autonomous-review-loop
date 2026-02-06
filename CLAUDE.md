@@ -14,7 +14,7 @@ Autonomous Review Loop - pairs your review bot with your coding agent to automat
 
 ## Tech Stack
 
-- **Python**: 3.13+ with uv (CLI package + project tooling)
+- **Python**: 3.12+ with uv (CLI package + project tooling)
 - **Bash**: 4.0+ for review loop scripts (bundled in `src/reviewloop_cli/templates/`)
 - **CLI Framework**: typer, readchar (interactive selection)
 - **Linting/Formatting**: ruff
@@ -32,7 +32,7 @@ uv run pyright
 
 - Self-explaining modular code: comment-free where possible (only comments when genuinely helpful)
 - Bash scripts use strict mode (`set -euo pipefail`)
-- Python 3.13+, line length 120, double quotes
+- Python 3.12+, line length 120, double quotes
 - Strict type hints (pyright strict mode) - all methods must be typed
 - Never suppress type/lint errors - fix them  (rare exceptions only)
 - Avoid creating barrel exports via init files, always directly import instead
