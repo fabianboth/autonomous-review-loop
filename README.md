@@ -48,12 +48,13 @@ cp -r .claude/skills/reviewloop /path/to/your/project/.claude/skills/
 
 ### Option 3: Standalone Scripts
 
-If you're not using Claude Code, you can use the scripts directly:
+If you're not using Claude Code, initialize with script mode:
 
 ```bash
-git clone https://github.com/fabianboth/autonomous-review-loop.git
-cd autonomous-review-loop
+reviewloop init --mode script
 ```
+
+This creates a `scripts/reviewloop/` directory with the scripts and a `reviewPrompt.txt` you can feed to any coding agent.
 
 ## Usage
 
@@ -74,7 +75,7 @@ The agent will autonomously:
 
 ### With Standalone Scripts
 
-Copy `scripts/bash/` to your project directory, then prompt your coding agent with the contents of `.claude/skills/reviewloop/SKILL.md` (the section after the YAML frontmatter).
+If you initialized with `--mode script`, prompt your coding agent with the contents of `scripts/reviewloop/reviewPrompt.txt`.
 
 ## Troubleshooting
 
@@ -105,7 +106,7 @@ gh auth login
 The default timeout is 10 minutes. If your CI takes longer, the script will inform you and you can re-run with a longer timeout:
 
 ```bash
-./scripts/bash/review-wait.sh --timeout=1200
+scripts/reviewloop/review-wait.sh --timeout=1200
 ```
 
 ## Status

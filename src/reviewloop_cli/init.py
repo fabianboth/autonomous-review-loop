@@ -4,7 +4,7 @@ import os
 import shutil
 import stat
 from enum import StrEnum
-from importlib.resources import as_file, files
+from importlib.resources import files
 from pathlib import Path
 from typing import Annotated
 
@@ -25,8 +25,11 @@ class InitMode(StrEnum):
 
 def _templates_path() -> Path:
     source = files("reviewloop_cli.templates")
-    ctx = as_file(source)
-    return Path(str(ctx.__enter__()))
+    path = Path(str(source))
+    if not path.is_dir():
+        print("Error: template files not found. The reviewloop package may be corrupted — try reinstalling.")
+        raise typer.Exit(code=1)
+    return path
 
 
 def _strip_frontmatter(content: str) -> str:
