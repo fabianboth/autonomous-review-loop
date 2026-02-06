@@ -25,7 +25,19 @@ The solution: delegate the entire review loop to your coding agent. It waits for
 
 ## Installation
 
-### Option 1: Claude Code Skill (Recommended)
+### Option 1: CLI (Recommended)
+
+```bash
+uv tool install reviewloop --from git+https://github.com/fabianboth/autonomous-review-loop.git
+```
+
+Then initialize in your project:
+
+```bash
+reviewloop init
+```
+
+### Option 2: Claude Code Skill (Manual)
 
 Copy the skill directory to your project:
 
@@ -34,7 +46,7 @@ Copy the skill directory to your project:
 cp -r .claude/skills/reviewloop /path/to/your/project/.claude/skills/
 ```
 
-### Option 2: Standalone Scripts
+### Option 3: Standalone Scripts
 
 If you're not using Claude Code, you can use the scripts directly:
 

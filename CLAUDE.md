@@ -12,6 +12,10 @@ Autonomous Review Loop - a workflow tool that automates the review-fix-push cycl
 /
 ├── pyproject.toml        # Project configuration (uv, pyright, ruff)
 ├── uv.lock               # Dependency lock file
+├── src/
+│   └── reviewloop_cli/   # CLI package (typer-based)
+│       ├── __init__.py
+│       └── cli.py        # App, commands, entry point
 ├── scripts/
 │   └── bash/             # Review loop scripts
 │       ├── review-wait.sh
@@ -23,7 +27,8 @@ Autonomous Review Loop - a workflow tool that automates the review-fix-push cycl
 ## Tech Stack
 
 - **Bash**: 4.0+ for review loop scripts
-- **Python**: 3.13+ with uv (for project tooling)
+- **Python**: 3.13+ with uv (CLI package + project tooling)
+- **CLI Framework**: typer
 - **Linting/Formatting**: ruff
 - **Type Checking**: pyright (strict mode)
 
