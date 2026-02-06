@@ -9,6 +9,7 @@ node_modules/
 __pycache__/
 *.pyc
 *.pyo
+*.egg-info/
 .venv/
 venv/
 
