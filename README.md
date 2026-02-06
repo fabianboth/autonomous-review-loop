@@ -19,7 +19,7 @@
 ## Prerequisites
 
 - [GitHub CLI](https://cli.github.com/) (`gh`), authenticated with your account
-- [jq](https://jqlang.org/)
+- [jq](https://jqlang.org/), for JSON parsing within bash
 
 ## Installation
 
