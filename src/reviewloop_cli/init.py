@@ -185,13 +185,8 @@ def _prompt_mode() -> InitMode:
     return InitMode.CLAUDE_CODE
 
 
-def _resolve_target_dir(project_name: str | None, here: bool) -> Path:
-    if here:
-        return Path.cwd()
-    if project_name is None:
-        name: str = str(typer.prompt("Project folder name"))
-    else:
-        name = project_name
+def _prompt_target_dir() -> Path:
+    name: str = typer.prompt("Project folder", default=".")
     if name == ".":
         return Path.cwd()
     target = Path.cwd() / name
@@ -199,17 +194,24 @@ def _resolve_target_dir(project_name: str | None, here: bool) -> Path:
     return target
 
 
+def _resolve_target_dir(project_name: str | None) -> Path:
+    if project_name is None:
+        return _prompt_target_dir()
+    if project_name == ".":
+        return Path.cwd()
+    target = Path.cwd() / project_name
+    target.mkdir(parents=True, exist_ok=True)
+    return target
+
+
 def init(
-    project_name: Annotated[str | None, typer.Argument(help="Target directory name for initialization.")] = None,
+    project_name: Annotated[
+        str | None, typer.Argument(help="Target directory name (defaults to current directory).")
+    ] = None,
     mode: Annotated[InitMode | None, typer.Option("--mode", help="Initialization mode.")] = None,
-    here: Annotated[bool, typer.Option("--here", help="Initialize in the current directory.")] = False,
     force: Annotated[bool, typer.Option("--force", help="Overwrite existing files without confirmation.")] = False,
 ) -> None:
-    if project_name is not None and here:
-        print("Error: cannot specify both a project name and --here.")
-        raise typer.Exit(code=1)
-
-    target_dir = _resolve_target_dir(project_name, here)
+    target_dir = _resolve_target_dir(project_name)
 
     if mode is None:
         mode = _prompt_mode()
