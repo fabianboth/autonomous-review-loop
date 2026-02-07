@@ -32,7 +32,7 @@ get_ci_state() {
     checks_json=$(gh pr checks "$pr_number" --json name,state 2>&1) || die "Failed to fetch PR checks: $checks_json"
 
     # Get all check states
-    states=$(echo "$checks_json" | jq -r '[.[] | .state] | if length == 0 then "" else .[] end' 2>/dev/null)
+    states=$(echo "$checks_json" | jq -r '[.[] | .state] | if length == 0 then "" else .[] end' 2>/dev/null | tr -d '\r')
 
     [[ -z "$states" ]] && return
 
