@@ -90,7 +90,7 @@ print_failed_checks() {
     local filter
     filter=$(failure_states_jq_filter)
     echo "CI failed. Failed checks:"
-    echo "$LAST_CHECKS_JSON" | jq -r --argjson states "$filter" '.[] | select(.state as $s | $states | index($s)) | "  - " + .name' 2>/dev/null | tr -d '\r'
+    echo "$LAST_CHECKS_JSON" | jq -r --argjson states "$filter" '.[] | select((.state | ascii_downcase) as $s | $states | index($s)) | "  - " + .name' 2>/dev/null | tr -d '\r'
 }
 
 parse_args() {
