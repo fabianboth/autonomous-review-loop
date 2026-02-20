@@ -30,15 +30,15 @@ Run `.claude/skills/reviewloop/scripts/review-wait.sh` to poll for CI completion
 - Waits 10s for CI to start (in case called right after push)
 - Polls every 15s until CI completes
 - Times out after 10 minutes (configurable with `--timeout=SECONDS`)
-- Exits immediately if no CI is in progress
+- Exits immediately if no CI is in progress, early exits if CI fails.
 
 ### 3. Fetch and address comments
 
-Once CI completes:
-
 1. Run `.claude/skills/reviewloop/scripts/review-comments.sh` to fetch comments into `.reviews/prComments.md`
-2. Review all comments critically - not all may be valid or apply to our codebase
-3. **ASK BACK** the user for decisions if needed before implementing fixes
+2. Classify every comment as **Address**, **Dismiss**, or **Needs user input**:
+   - **Dismiss** without asking if: factually wrong, misunderstanding, doesn't apply, already handled, or trivial nitpick conflicting with project conventions.
+   - **Needs user input** for real decisions: scope questions, design trade-offs, unclear priority. When in doubt, ask.
+3. **ASK BACK** the user for decisions if needed before implementing fixes. Also present all "Needs user input" comments batched to the user at this point.
 4. Address valid issues
 5. For inline threads: resolve via the `gh api graphql` mutation shown in the file (whether addressed or rejected)
 6. For general review comments: react with thumbs-up via the mutation shown in the file to mark as processed (even if no action was needed)
